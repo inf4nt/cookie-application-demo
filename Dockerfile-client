@@ -1,0 +1,15 @@
+FROM ubuntu:24.04
+
+RUN apt update -y && apt upgrade -y
+RUN apt install curl -y
+
+RUN echo '#!/bin/sh' > test.sh && \
+    echo 'until curl -s $COOKIE_APP_URL; do' >> test.sh && \
+    echo '  echo "Waiting for the $COOKIE_APP_URL to start... "' >> test.sh && \
+    echo '  sleep 0.5  # Check every 0.5 second' >> test.sh && \
+    echo 'done' >> test.sh && \
+    echo 'curl -i -c cookies.txt $COOKIE_APP_URL/get' >> test.sh && \
+    echo 'curl -i -b cookies.txt $COOKIE_APP_URL/save' >> test.sh && \
+    chmod +x test.sh
+
+CMD ["sh", "test.sh"]
