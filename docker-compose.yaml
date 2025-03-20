@@ -4,14 +4,20 @@ services:
       dockerfile: Dockerfile-application
     container_name: cookie-application
     image: cookie-application
+    healthcheck:
+      test: ["CMD", "curl", "--fail", "http://localhost:8080"]
+      interval: 1s
+      timeout: 1s
+      retries: 20
     environment:
-      server.port: 8080
+      SERVER_PORT: 8080
   cookie-client:
     build:
       dockerfile: Dockerfile-client
     container_name: cookie-client
     image: cookie-client
     depends_on:
-      - cookie-application
+      cookie-application:
+        condition: service_healthy
     environment:
       COOKIE_APP_URL: cookie-application:8080
